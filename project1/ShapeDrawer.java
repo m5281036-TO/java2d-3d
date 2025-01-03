@@ -9,6 +9,9 @@ import java.util.List;
 
 public class ShapeDrawer extends JPanel {
     private List<List<Point2D.Float>> shapes;
+    float minX = Float.MAX_VALUE, maxX = Float.MIN_VALUE;
+    float minY = Float.MAX_VALUE, maxY = Float.MIN_VALUE;
+       
 
     public ShapeDrawer(String filePath) {
         shapes = loadPointsFromFile(filePath);
@@ -32,11 +35,17 @@ public class ShapeDrawer extends JPanel {
 
                 // 残りの行を読み取り座標リストに追加
                 String line;
-                for (int j = 0; j < numPoints-1; j++){
+                for (int j = 0; j < numPoints; j++){
                     line = br.readLine();
                     String[] coords = line.trim().split(" "); // split a raw with blank
-                    float x = Float.parseFloat(coords[0]) * 100 + 100;
-                    float y = Float.parseFloat(coords[1]) * 100 + 100;
+                    
+                    float x = Float.parseFloat(coords[0]);
+                    if (j == 0 && x < minX) minX = x; // storing min and max value in shape 1
+                    if (j == 0 && x > maxX) maxX = x;
+
+                    float y = Float.parseFloat(coords[1]);
+                    if (j == 0 && y < minY) minX = y;
+                    if (j == 0 && y > maxY) maxY = y;
 
                     // add coordinate to the points list
                     Point2D.Float point = new Point2D.Float(x,y);
@@ -48,6 +57,12 @@ public class ShapeDrawer extends JPanel {
                 // clear points
                 points.clear();
             }
+
+            System.out.println("shape1 min x: " + minX + " max x: " + maxX);
+            System.out.println("shape1 min y: " + minY + " max y: " + maxY);
+
+            //normalization
+            
 
         } catch (IOException | NumberFormatException e) {
             System.err.println("Error reading file: " + e.getMessage());
@@ -87,8 +102,8 @@ public class ShapeDrawer extends JPanel {
         String dir = "./vert/";
         List<String> filenames = new ArrayList<String>(){
             {
-                add("disk.vert");
-                // add("key.vert");
+                // add("disk.vert");
+                add("key.vert");
                 // add("riderr.vert");
                 // add("superior.vert");
             }

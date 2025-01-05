@@ -90,20 +90,28 @@ public class ShapeDrawer extends JPanel {
         g2d.setColor(Color.BLUE);
         g2d.setStroke(new BasicStroke(2));
 
+
         // draw lines (curves)
         for (int i = 0; i < shapes.size(); i++){
-            for (int j = 0; j < shapes.get(i).size(); j++) {
-                Point2D.Float p = shapes.get(i).get(j);
-                Point2D.Float p_next = shapes.get(i).get((j + 1) % shapes.get(i).size()); // connect first and last point with line
-                g2d.drawLine((int) p.x, (int) p.y, (int) p_next.x, (int) p_next.y);
-                
+            int numPoints = shapes.get(i).size();
 
-                // compute an angle and print
-                // TODO: make it work
+            for (int j = 0; j < numPoints; j++) {
+                Point2D.Float p = shapes.get(i).get(j);
+                Point2D.Float p_next = shapes.get(i).get((j + 1) % numPoints); // connect first and last point with line
+                g2d.drawLine((int) p.x, (int) p.y, (int) p_next.x, (int) p_next.y);
+
+                // compute the discrete curvature
                 if(j > 0){
-                    Point2D.Float p_before = shapes.get(i).get((j - 1) % shapes.get(i).size());
+                    Point2D.Float p_before = shapes.get(i).get((j - 1) % numPoints);
                     double angle = calculateAngle(p_before, p, p_next);
                     System.out.println("Discrete curvature (theta) at (" + p.x + ", " + p.y + "): " + angle / Math.PI  + " (" + Math.toDegrees(angle) + " degree)");
+                }
+                else if (j == 0){
+                    // set last point as p_before 
+                    Point2D.Float p_before = shapes.get(i).get((numPoints-1) % numPoints);
+                    double angle = calculateAngle(p_before, p, p_next);
+                    System.out.println("Discrete curvature (theta) at (" + p.x + ", " + p.y + "): " + angle / Math.PI  + " (" + Math.toDegrees(angle) + " degree)");
+                
                 }
             }
         }
@@ -134,7 +142,6 @@ public class ShapeDrawer extends JPanel {
 
     // main function
     public static void main(String[] args) {
-        // TODO: 複数のファイルインプットに対応したJPanel
         // path of all vert files
         String dir = "./vert/";
         List<String> filenames = new ArrayList<String>(){
@@ -154,12 +161,14 @@ public class ShapeDrawer extends JPanel {
         frame.add(panel);
         frame.setSize(800, 600);
         frame.setVisible(true);
+        // exit at last
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // key.vert
         filepath = dir + filenames.get(1);
         frame = new JFrame(filenames.get(1));
         System.out.println(filepath);
-        panel = new ShapeDrawer(filepath,  2, 2, 5);
+        panel = new ShapeDrawer(filepath,  2, 1, 3);
         frame.add(panel);
         frame.setSize(800, 600);
         frame.setVisible(true);
@@ -181,9 +190,6 @@ public class ShapeDrawer extends JPanel {
         frame.add(panel);
         frame.setSize(800, 600);
         frame.setVisible(true);
-
-        // exit at last
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     }
 }

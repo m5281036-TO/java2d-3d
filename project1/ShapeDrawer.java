@@ -143,25 +143,50 @@ public class ShapeDrawer extends JPanel {
         List<String> filenames = new ArrayList<String>(){
             {
                 add("disk.vert");
-                // add("key.vert");
-                // add("riderr.vert");
-                // add("superior.vert");
+                add("key.vert");
+                add("riderr.vert");
+                add("superior.vert");
             }
         };
 
-        for (int i=0; i<filenames.size(); i++){
-            String filepath = dir + filenames.get(i);
-            // creating window
-            JFrame frame = new JFrame("Shape Drawer");
+        // disk.vert
+        String filepath = dir + filenames.get(0);
+        JFrame frame = new JFrame(filenames.get(0));
+        System.out.println(filepath);
+        ShapeDrawer panel = new ShapeDrawer(filepath,  1, 1, 100);
+        frame.add(panel);
+        frame.setSize(800, 600);
+        frame.setVisible(true);
 
-            // drowing shape from vert file
-            System.out.println(filepath);
-            ShapeDrawer panel = new ShapeDrawer(filepath,  2, 2, 100);
+        // key.vert
+        filepath = dir + filenames.get(1);
+        frame = new JFrame(filenames.get(1));
+        System.out.println(filepath);
+        panel = new ShapeDrawer(filepath,  2, 2, 5);
+        frame.add(panel);
+        frame.setSize(800, 600);
+        frame.setVisible(true);
 
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.add(panel);
-            frame.setSize(800, 600);
-            frame.setVisible(true);
-        }
+        // riderr.vert
+        filepath = dir + filenames.get(2);
+        frame = new JFrame(filenames.get(2));
+        System.out.println(filepath);
+        panel = new ShapeDrawer(filepath,  10, 6, 20);
+        frame.add(panel);
+        frame.setSize(800, 600);
+        frame.setVisible(true);
+
+        // superior.vert
+        filepath = dir + filenames.get(3);
+        frame = new JFrame(filenames.get(3));
+        System.out.println(filepath);
+        panel = new ShapeDrawer(filepath,  0, 1, 600);
+        frame.add(panel);
+        frame.setSize(800, 600);
+        frame.setVisible(true);
+
+        // exit at last
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
     }
 }

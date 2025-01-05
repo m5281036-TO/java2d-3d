@@ -93,46 +93,43 @@ public class ShapeDrawer extends JPanel {
         // draw lines (curves)
         for (int i = 0; i < shapes.size(); i++){
             for (int j = 0; j < shapes.get(i).size(); j++) {
-                Point2D.Float p1 = shapes.get(i).get(j);
-                Point2D.Float p2 = shapes.get(i).get((j + 1) % shapes.get(i).size()); // connect first and last point with line
-                g2d.drawLine((int) p1.x, (int) p1.y, (int) p2.x, (int) p2.y);
+                Point2D.Float p = shapes.get(i).get(j);
+                Point2D.Float p_next = shapes.get(i).get((j + 1) % shapes.get(i).size()); // connect first and last point with line
+                g2d.drawLine((int) p.x, (int) p.y, (int) p_next.x, (int) p_next.y);
                 
 
                 // compute an angle and print
                 // TODO: make it work
                 if(j > 0){
-                    // double angle = calculateAngle(p_before, p1, p2);
                     Point2D.Float p_before = shapes.get(i).get((j - 1) % shapes.get(i).size());
-                    System.out.println ("before: " + p_before);
-                    System.out.println ("p1: " + p1);
-                    System.out.println ("after: " + p2);
+                    double angle = calculateAngle(p_before, p, p_next);
+                    System.out.println("Discrete curvature (theta) at (" + p.x + ", " + p.y + "): " + angle / Math.PI  + " (" + Math.toDegrees(angle) + " degree)");
                 }
             }
         }
     }
 
 
-    // function to compute the two lines
-    // private double calculateAngle(Point2D.Float p1, Point2D.Float p2, Point2D.Float p3) {
-    //     // ベクトルp1->p2とp2->p3を計算
-    //     float v1x = p2.x - p1.x;
-    //     float v1y = p2.y - p1.y;
-    //     float v2x = p3.x - p2.x;
-    //     float v2y = p3.y - p2.y;
+    // function to compute discrete curvature at the point
+    private double calculateAngle(Point2D.Float p_before, Point2D.Float p, Point2D.Float p_next) {
+        // compute two vectors around a point
+        float v1x = p.x - p_before.x;
+        float v1y = p.y - p_before.y;
+        float v2x = p_next.x - p.x;
+        float v2y = p_next.y - p.y;
 
-    //     // ベクトルの内積を計算
-    //     float dotProduct = v1x * v2x + v1y * v2y;
+        // compute the inner product of two vectors
+        float dotProduct = v1x * v2x + v1y * v2y;
 
-    //     // ベクトルの大きさを計算
-    //     double magnitude1 = Math.sqrt(v1x * v1x + v1y * v1y);
-    //     double magnitude2 = Math.sqrt(v2x * v2x + v2y * v2y);
+        // get the size of two vectors
+        double magnitude1 = Math.sqrt(v1x * v1x + v1y * v1y);
+        double magnitude2 = Math.sqrt(v2x * v2x + v2y * v2y);
 
-    //     // cosθ = (内積) / (|v1| * |v2|)
-    //     double cosTheta = dotProduct / (magnitude1 * magnitude2);
+        double cosTheta = dotProduct / (magnitude1 * magnitude2);
 
-    //     // 角度をラジアンから度に変換して返す
-    //     return Math.toDegrees(Math.acos(cosTheta));
-    // }
+        // return degree as radian
+        return Math.acos(cosTheta);
+    }
 
 
     // main function

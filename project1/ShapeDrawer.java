@@ -9,12 +9,12 @@ import java.util.List;
 
 public class ShapeDrawer extends JPanel {
     private List<List<Point2D.Float>> shapes;
-    private float magnification;
+    private String draw_mode;
        
 
-    public ShapeDrawer(String filePath, float margin_x, float margin_y, float magnification) {
+    public ShapeDrawer(String filePath, String draw_mode, float margin_x, float margin_y, float magnification) {
         shapes = loadPointsFromFile(filePath, margin_x, margin_y, magnification);
-        this.magnification = magnification;
+        this.draw_mode = draw_mode;
     }
 
 
@@ -96,7 +96,7 @@ public class ShapeDrawer extends JPanel {
 
                 // compute the discrete curvature
                 double angle = calculateAngle(p_before, p_current, p_next);
-                // System.out.println("Discrete curvature (theta) at (" + p_current.x + ", " + p_current.y + "): " + angle / Math.PI  + " (" + Math.toDegrees(angle) + " degree)");
+                System.out.println("Discrete curvature (theta) at (" + p_current.x + ", " + p_current.y + "): " + angle / Math.PI  + " (" + Math.toDegrees(angle) + " degree)");
                                 
                 // draw a main line (curve)
                 // set color and boldness
@@ -104,19 +104,28 @@ public class ShapeDrawer extends JPanel {
                 g2d.setStroke(new BasicStroke(5));
                 g2d.drawLine((int) p_current.x, (int) p_current.y, (int) p_next.x, (int) p_next.y);
 
-                // draw a unit tangent to a curve
-                // set color and boldness
-                g2d.setColor(Color.RED);
-                g2d.setStroke(new BasicStroke(1));
-                Point2D.Float p_unit_tan = getUnitTangentPoint(p_before, p_current, p_next, magnification);
-                g2d.drawLine((int) p_current.x, (int) p_current.y, (int) p_unit_tan.x, (int) p_unit_tan.y);
-
+                if(draw_mode == "curve_with_unit_tan"){
+                    // draw a unit tangent vector
+                    g2d.setColor(Color.RED);
+                    g2d.setStroke(new BasicStroke(1));
+                    Point2D.Float p_unit_tan = getUnitTangentPoint(p_before, p_current, p_next);
+                    g2d.drawLine((int) p_current.x, (int) p_current.y, (int) p_unit_tan.x, (int) p_unit_tan.y);
+                }
+                else if(draw_mode == "curve_with_normal"){
+                    // draw a unit normal vector
+                    g2d.setColor(Color.ORANGE);
+                    g2d.setStroke(new BasicStroke(1));
+                    Point2D.Float p_unit_tan = getUnitNormalPoint(p_before, p_current, p_next);
+                    g2d.drawLine((int) p_current.x, (int) p_current.y, (int) p_unit_tan.x, (int) p_unit_tan.y);
+                }
+                    
             }
 
         }
 
-        // TODO: draw a norm
     }
+
+        // TODO: draw a norm
 
 
     // function to compute discrete curvature at the point
@@ -141,17 +150,35 @@ public class ShapeDrawer extends JPanel {
     }
 
 
-    // computation of a unit tangent
-    private Point2D.Float getUnitTangentPoint (Point2D.Float p_before, Point2D.Float p_current, Point2D.Float p_next, float magnification){
+    // computation of an unit tangent
+    private Point2D.Float getUnitTangentPoint (Point2D.Float p_before, Point2D.Float p_current, Point2D.Float p_next){
         float tangent_x = p_next.x - p_before.x;
         float tangent_y = p_next.y - p_before.y;
         float length = (float) Math.sqrt(tangent_x * tangent_x + tangent_y * tangent_y);
-        float unit_tangent_x = tangent_x / length * 50;
+        float unit_tangent_x = tangent_x / length * 50; // scale for visiblity (x50)
         float unit_tangent_y = tangent_y / length * 50;
         Point2D.Float p_unit_tan = new Point2D.Float(p_current.x + unit_tangent_x, p_current.y + unit_tangent_y);
 
         return p_unit_tan;
     }
+
+
+    // computation of an unit normal 
+    private Point2D.Float getUnitNormalPoint (Point2D.Float p_before, Point2D.Float p_current, Point2D.Float p_next){
+        float tangent_x = p_next.x - p_before.x;
+        float tangent_y = p_next.y - p_before.y;
+        // rotate 90 degrees
+        float norm_x = tangent_y;
+        float norm_y = -tangent_x;
+        float length = (float) Math.sqrt(norm_x * norm_x + norm_y * norm_y);
+        float unit_norm_x = norm_x / length * 50; // scale for visiblity (x50)
+        float unit_norm_y = norm_y / length * 50;
+        
+        Point2D.Float p_norm = new Point2D.Float(p_current.x + unit_norm_x, p_current.y + unit_norm_y);
+
+        return p_norm;
+    }
+
 
 
     private static void displayPanel (String filename, float margin_x, float margin_y, float magnification, boolean is_last_window){
@@ -161,30 +188,33 @@ public class ShapeDrawer extends JPanel {
 
         System.out.println(filepath);
 
-        // init of frame
-        JFrame frame = new JFrame(filename);
-        ShapeDrawer panel = new ShapeDrawer(filepath,  margin_x, margin_y, magnification);
-        frame.add(panel);
-        frame.setSize(800, 600);
-        frame.setVisible(true);
-        
-        // exit at last
-        if (is_last_window == true){
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        }
+        List<String> draw_mode = new ArrayList<String>(){
+            {
+                add("curve");
+                add("curve_with_unit_tan");
+                add("curve_with_normal");
+            }
+        };
 
+        for (String mode: draw_mode){
+            // init of frame
+            JFrame frame = new JFrame(filename + ": " + mode);
+            ShapeDrawer panel = new ShapeDrawer(filepath, mode, margin_x, margin_y, magnification);
+            frame.add(panel);
+            frame.setSize(800, 600);
+            frame.setVisible(true);
+            
+            // exit at last
+            if (is_last_window == true){
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            }
+        }
     }
 
 
 
     // main function
     public static void main(String[] args) {
-        // init
-        String dir = "./vert/";
-        String filepath;
-        JFrame frame;
-        ShapeDrawer panel;
-
         // path of all vert files
         List<String> filenames = new ArrayList<String>(){
             {
@@ -196,7 +226,7 @@ public class ShapeDrawer extends JPanel {
         };
 
         // disk.vert
-        displayPanel(filenames.get(0), 1, 1, 100, true);
+        displayPanel(filenames.get(0), 2, 2, 100, true);
 
         // key.vert
         displayPanel(filenames.get(1), 2, 1, 3, false);

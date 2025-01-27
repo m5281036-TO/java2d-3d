@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -10,11 +11,12 @@ import java.awt.event.KeyEvent;
 public class SurfaceDrawer extends JFrame {
 
     private List<Point3D> pointCloud;
+    private List<Point3D> pointCloudOriginal;
     private String filepath;
-    private float MOVING_AMOUNT = 50; 
-    private float ROTATION_AMOUT = 15;
-    private double rotationX = 0; // X軸の回転角度
-    private double rotationY = 0; // Y軸の回転角度
+    private float MOVING_AMOUNT = 50; // amount of motion with one button click
+    private float ROTATION_DEGREE = 15; // amount of rotation with one button click
+    private double rotationX = 0;
+    private double rotationY = 0;
 
 
 
@@ -25,6 +27,7 @@ public class SurfaceDrawer extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         filepath = getFilepath();
         pointCloud = getPointCloudFromFile(filepath);
+        pointCloudOriginal = getPointCloudFromFile(filepath); // copy original
         scalePointCloud(100);
         add(new Canvas3D());
 
@@ -59,20 +62,26 @@ public class SurfaceDrawer extends JFrame {
                     movePointCloud("right", MOVING_AMOUNT); // left
                     System.out.println("moving right");
                 }
+                // reset orientation
+                else if (e.getKeyChar() == 'r'){
+                    resetObject();
+                    System.out.println("Object orientation reset");
+                }
+                
             
                 // rotateing object
                 switch (e.getKeyCode()) {
                 case KeyEvent.VK_UP:
-                    rotatePointCloudX(-10); // 上矢印キーでX軸回転
+                    rotatePointCloudX(-ROTATION_DEGREE); // rotate positively in x-axis
                     break;
                 case KeyEvent.VK_DOWN:
-                    rotatePointCloudX(10); // 下矢印キーでX軸回転
+                    rotatePointCloudX(ROTATION_DEGREE); // rotate negatively in x-axis
                     break;
                 case KeyEvent.VK_LEFT:
-                    rotatePointCloudY(-10); // 左矢印キーでY軸回転
+                    rotatePointCloudY(-ROTATION_DEGREE); // rotate positively in y-axis
                     break;
                 case KeyEvent.VK_RIGHT:
-                    rotatePointCloudY(10); // 右矢印キーでY軸回転
+                    rotatePointCloudY(ROTATION_DEGREE); // rotate negatively in y-axis
                     break;
                 }
             }
@@ -111,7 +120,6 @@ public class SurfaceDrawer extends JFrame {
                 float norm_y = Float.parseFloat(coords[1]);
                 float norm_z = Float.parseFloat(coords[2]);
                 norms.add(new Point3D(norm_x, norm_y, norm_z));
-
             }
             
         } catch (IOException e) {
@@ -183,37 +191,22 @@ public class SurfaceDrawer extends JFrame {
         repaint();
     }
 
-    public void rotatePointCloud(String axis, float angle) {
+
+    // ------ function to reset object orientation ------
+    // TODO: set default object size as an approprimate size
+    public void resetObject(){
         for (int i = 0; i < pointCloud.size(); i++) {
-            Point3D point = pointCloud.get(i);
-        //     if (direction == "l") { //left
-        //         pointCloud.set(i, new Point3D(
-        //             point.getX() + movingAmount,
-        //             point.getY(),
-        //             point.getZ()
-        //         ));
-        //     } else if (direction == "a") { //above
-        //         pointCloud.set(i, new Point3D(
-        //             point.getX(),
-        //             point.getY() - movingAmount,
-        //             point.getZ()
-        //         ));
-        //     } else if (direction == "b") { //below
-        //         pointCloud.set(i, new Point3D(
-        //             point.getX(),
-        //             point.getY() + movingAmount,
-        //             point.getZ()
-        //         ));
-        //     } else if (direction == "r") { //right
-        //         pointCloud.set(i, new Point3D(
-        //             point.getX() - movingAmount,
-        //             point.getY(),
-        //             point.getZ()
-        //         ));
-        //     } 
+            Point3D original_point = pointCloudOriginal.get(i);
+            pointCloud.set(i, new Point3D(
+                original_point.getX(),
+                original_point.getY(),
+                original_point.getZ()
+            ));
         }
-        // repaint();
+        repaint();
     }
+
+
 
 
     private class Canvas3D extends JPanel {
@@ -234,34 +227,36 @@ public class SurfaceDrawer extends JFrame {
             int offsetX = width / 2;
             int offsetY = height / 2;
 
+            // set plot color
             g2d.setColor(Color.BLUE);
 
+            // controlling the display of the points
             for (Point3D point : pointCloud) {
-                double x = point.getX();
-                double y = point.getY();
-                double z = point.getZ();
+                double p_x = point.getX();
+                double p_y = point.getY();
+                double p_z = point.getZ();
 
                 // roatate in x axis
-                double tempY = y * Math.cos(rotationX) - z * Math.sin(rotationX);
-                double tempZ = y * Math.sin(rotationX) + z * Math.cos(rotationX);
-                y = tempY;
-                z = tempZ;
+                double new_Y = p_y * Math.cos(rotationX) - p_z * Math.sin(rotationX);
+                double new_Z = p_y * Math.sin(rotationX) + p_z * Math.cos(rotationX);
+                p_y = new_Y;
+                p_z = new_Z;
 
                 // roatate in y axis
-                double tempX = x * Math.cos(rotationY) + z * Math.sin(rotationY);
-                z = -x * Math.sin(rotationY) + z * Math.cos(rotationY);
-                x = tempX;
+                double new_X = p_x * Math.cos(rotationY) + p_z * Math.sin(rotationY);
+                p_z = -p_x * Math.sin(rotationY) + p_z * Math.cos(rotationY);
+                p_x = new_X;
 
                 // project 3D objects into 2D display
-                int screenX = (int) (x / scale + offsetX);
-                int screenY = (int) (-y / scale + offsetY);
+                int screenX = (int) (p_x / scale + offsetX);
+                int screenY = (int) (-p_y / scale + offsetY);
                 g2d.fillOval(screenX, screenY, 4, 4);
             }
         }
     }
 
 
-    // ------ class to store point cloud data ------
+    // ------ class to call point cloud data ------
     private static class Point3D {
         private final double x;
         private final double y;
@@ -276,11 +271,9 @@ public class SurfaceDrawer extends JFrame {
         public double getX() {
             return x;
         }
-
         public double getY() {
             return y;
         }
-
         public double getZ() {
             return z;
         }

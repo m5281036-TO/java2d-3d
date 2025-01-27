@@ -11,7 +11,11 @@ public class SurfaceDrawer extends JFrame {
 
     private List<Point3D> pointCloud;
     private String filepath;
-    private float MOVING_AMOUNT = 50;
+    private float MOVING_AMOUNT = 50; 
+    private float ROTATION_AMOUT = 15;
+    private double rotationX = 0; // X軸の回転角度
+    private double rotationY = 0; // Y軸の回転角度
+
 
 
     // ------ main instance ------
@@ -30,27 +34,46 @@ public class SurfaceDrawer extends JFrame {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                // scaling shapes
-                if (e.getKeyChar() == '=') {
+                // scaling object
+                if (e.getKeyChar() == '='){
                     scalePointCloud(1.2); // zoom in
                     System.out.println("Zoom In x1.2");
                 } else if (e.getKeyChar() == '-') {
                     scalePointCloud(0.85); // zoom out
                     System.out.println("Zoom Out x0.85");
                 }
-                // moving shapes
-                else if (e.getKeyChar() == 'a') {
-                    movePointCloud("l", MOVING_AMOUNT); // left
+                // moving object
+                else if (e.getKeyChar() == 'a'){
+                    movePointCloud("left", MOVING_AMOUNT); // left 
                     System.out.println("moving left");
-                } else if (e.getKeyChar() == 'w') {
-                    movePointCloud("a", MOVING_AMOUNT); // above
-                    System.out.println("moving avobe");
-                } else if (e.getKeyChar() == 's') {
-                    movePointCloud("b", MOVING_AMOUNT); // below
+                }
+                else if (e.getKeyChar() == 'w'){
+                    movePointCloud("above", MOVING_AMOUNT); // left
+                    System.out.println("moving above");
+                }
+                else if (e.getKeyChar() == 's'){
+                    movePointCloud("below", MOVING_AMOUNT); // left
                     System.out.println("moving below");
-                } else if (e.getKeyChar() == 'd') {
-                    movePointCloud("r", MOVING_AMOUNT); // right
-                    System.out.println("moving right");   
+                }
+                else if (e.getKeyChar() == 'd'){
+                    movePointCloud("right", MOVING_AMOUNT); // left
+                    System.out.println("moving right");
+                }
+            
+                // rotateing object
+                switch (e.getKeyCode()) {
+                case KeyEvent.VK_UP:
+                    rotatePointCloudX(-10); // 上矢印キーでX軸回転
+                    break;
+                case KeyEvent.VK_DOWN:
+                    rotatePointCloudX(10); // 下矢印キーでX軸回転
+                    break;
+                case KeyEvent.VK_LEFT:
+                    rotatePointCloudY(-10); // 左矢印キーでY軸回転
+                    break;
+                case KeyEvent.VK_RIGHT:
+                    rotatePointCloudY(10); // 右矢印キーでY軸回転
+                    break;
                 }
             }
         });
@@ -102,8 +125,7 @@ public class SurfaceDrawer extends JFrame {
 
 
     // reference for scaling and orientation (Japanese): 
-    // http://www.maroon.dti.ne.jp/koten-kairo/works/Java3D/transform2.html (basic transformation method)
-
+    // http://www.maroon.dti.ne.jp/koten-kairo/works/Java3D/transform2.html (basic transformation method of objects)
     // ------ function to scale the shape ------
     public void scalePointCloud(double scaleFactor) {
         for (int i = 0; i < pointCloud.size(); i++) {
@@ -118,28 +140,28 @@ public class SurfaceDrawer extends JFrame {
     }
 
     // ------ function to move the shape ------
-    public void movePointCloud(String direction, double movingAmount) {
+    public void movePointCloud(String direction, float movingAmount) {
         for (int i = 0; i < pointCloud.size(); i++) {
             Point3D point = pointCloud.get(i);
-            if (direction == "l") { //left
+            if (direction == "left") {
                 pointCloud.set(i, new Point3D(
                     point.getX() + movingAmount,
                     point.getY(),
                     point.getZ()
                 ));
-            } else if (direction == "a") { //above
+            } else if (direction == "above") {
                 pointCloud.set(i, new Point3D(
                     point.getX(),
                     point.getY() - movingAmount,
                     point.getZ()
                 ));
-            } else if (direction == "b") { //below
+            } else if (direction == "below") {
                 pointCloud.set(i, new Point3D(
                     point.getX(),
                     point.getY() + movingAmount,
                     point.getZ()
                 ));
-            } else if (direction == "r") { //right
+            } else if (direction == "right") {
                 pointCloud.set(i, new Point3D(
                     point.getX() - movingAmount,
                     point.getY(),
@@ -148,6 +170,49 @@ public class SurfaceDrawer extends JFrame {
             } 
         }
         repaint();
+    }
+
+    // ------ functions to rotate the shape ------
+    public void rotatePointCloudX(double angle) {
+        rotationX += Math.toRadians(angle);
+        repaint();
+    }
+
+    public void rotatePointCloudY(double angle) {
+        rotationY += Math.toRadians(angle);
+        repaint();
+    }
+
+    public void rotatePointCloud(String axis, float angle) {
+        for (int i = 0; i < pointCloud.size(); i++) {
+            Point3D point = pointCloud.get(i);
+        //     if (direction == "l") { //left
+        //         pointCloud.set(i, new Point3D(
+        //             point.getX() + movingAmount,
+        //             point.getY(),
+        //             point.getZ()
+        //         ));
+        //     } else if (direction == "a") { //above
+        //         pointCloud.set(i, new Point3D(
+        //             point.getX(),
+        //             point.getY() - movingAmount,
+        //             point.getZ()
+        //         ));
+        //     } else if (direction == "b") { //below
+        //         pointCloud.set(i, new Point3D(
+        //             point.getX(),
+        //             point.getY() + movingAmount,
+        //             point.getZ()
+        //         ));
+        //     } else if (direction == "r") { //right
+        //         pointCloud.set(i, new Point3D(
+        //             point.getX() - movingAmount,
+        //             point.getY(),
+        //             point.getZ()
+        //         ));
+        //     } 
+        }
+        // repaint();
     }
 
 
@@ -172,9 +237,24 @@ public class SurfaceDrawer extends JFrame {
             g2d.setColor(Color.BLUE);
 
             for (Point3D point : pointCloud) {
-                // 3D座標を2Dに投影
-                int screenX = (int) (point.getX() / scale + offsetX);
-                int screenY = (int) (-point.getY() / scale + offsetY);
+                double x = point.getX();
+                double y = point.getY();
+                double z = point.getZ();
+
+                // roatate in x axis
+                double tempY = y * Math.cos(rotationX) - z * Math.sin(rotationX);
+                double tempZ = y * Math.sin(rotationX) + z * Math.cos(rotationX);
+                y = tempY;
+                z = tempZ;
+
+                // roatate in y axis
+                double tempX = x * Math.cos(rotationY) + z * Math.sin(rotationY);
+                z = -x * Math.sin(rotationY) + z * Math.cos(rotationY);
+                x = tempX;
+
+                // project 3D objects into 2D display
+                int screenX = (int) (x / scale + offsetX);
+                int screenY = (int) (-y / scale + offsetY);
                 g2d.fillOval(screenX, screenY, 4, 4);
             }
         }

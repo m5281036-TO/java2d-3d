@@ -3,15 +3,18 @@ import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 
 public class SurfaceDrawer extends JFrame {
 
     private List<Point3D> pointCloud;
     private String filepath;
+    private float MOVING_AMOUNT = 200;
 
 
-    // generate main instance
+    // ------ main instance ------
     public SurfaceDrawer() {
         setTitle("3D Point Cloud Visualization");
         setSize(800, 600);
@@ -20,6 +23,37 @@ public class SurfaceDrawer extends JFrame {
         pointCloud = getPointCloudFromFile(filepath);
         scalePointCloud(100);
         add(new Canvas3D());
+
+        // keyboard listener
+        // reference for on-button action
+        // https://qiita.com/derodero24/items/9ea025b92ac61edf0aa4
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                // scaling shapes
+                if (e.getKeyChar() == '=') {
+                    scalePointCloud(1.2); // zoom in
+                    System.out.println("Zoom In x1.2");
+                } else if (e.getKeyChar() == '-') {
+                    scalePointCloud(0.85); // zoom out
+                    System.out.println("Zoom Out x0.85");
+                }
+                // moving shapes
+                else if (e.getKeyChar() == 'a') {
+                    movePointCloud("l", MOVING_AMOUNT); // zoom in
+                    System.out.println("moving left");
+                } else if (e.getKeyChar() == 'w') {
+                    movePointCloud("a", MOVING_AMOUNT); // zoom out
+                    System.out.println("moving avobe");
+                } else if (e.getKeyChar() == 's') {
+                    movePointCloud("b", MOVING_AMOUNT); // zoom in
+                    System.out.println("moving below");
+                } else if (e.getKeyChar() == 'd') {
+                    movePointCloud("r", MOVING_AMOUNT); // zoom in
+                    System.out.println("moving right");   
+                }
+            }
+        });
     }
 
 
@@ -67,7 +101,10 @@ public class SurfaceDrawer extends JFrame {
     }
 
 
-    // ------ function to scale shape ------
+    // reference for scaling and orientation (Japanese): 
+    // http://www.maroon.dti.ne.jp/koten-kairo/works/Java3D/transform2.html (basic transformation method)
+
+    // ------ function to scale the shape ------
     public void scalePointCloud(double scaleFactor) {
         for (int i = 0; i < pointCloud.size(); i++) {
             Point3D point = pointCloud.get(i);
@@ -79,6 +116,21 @@ public class SurfaceDrawer extends JFrame {
         }
         repaint();
     }
+
+    // ------ function to move the shape ------
+    public void movePointCloud(String direction, double motionFactor) {
+        for (int i = 0; i < pointCloud.size(); i++) {
+            Point3D point = pointCloud.get(i);
+
+            pointCloud.set(i, new Point3D(
+                point.getX() + motionFactor,
+                point.getY() + motionFactor,
+                point.getZ() + motionFactor
+            ));
+        }
+        repaint();
+    }
+
 
 
 
@@ -143,10 +195,6 @@ public class SurfaceDrawer extends JFrame {
         SwingUtilities.invokeLater(() -> {
             SurfaceDrawer frame = new SurfaceDrawer();
             frame.setVisible(true);
-
-            // for test 
-            Timer timer = new Timer(1000, e -> frame.scalePointCloud(1.1)); // 毎秒拡大
-            timer.start();
         });
     }
 }

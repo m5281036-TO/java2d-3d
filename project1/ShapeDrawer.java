@@ -125,8 +125,6 @@ public class ShapeDrawer extends JPanel {
 
     }
 
-        // TODO: draw a norm
-
 
     // function to compute discrete curvature at the point
     private double calculateAngle(Point2D.Float p_before, Point2D.Float p_current, Point2D.Float p_next) {

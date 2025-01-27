@@ -38,7 +38,7 @@ public class SurfaceDrawer extends JPanel {
     public static void main(String args[]){
 
         //init
-        String dir = "./xyz";
+        String dir = "./data/xyz/";
         String filename = "bunny.xyz";
         String filepath = dir + filename;
 

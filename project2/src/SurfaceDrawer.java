@@ -11,7 +11,7 @@ public class SurfaceDrawer extends JFrame {
 
     private List<Point3D> pointCloud;
     private String filepath;
-    private float MOVING_AMOUNT = 200;
+    private float MOVING_AMOUNT = 50;
 
 
     // ------ main instance ------
@@ -40,16 +40,16 @@ public class SurfaceDrawer extends JFrame {
                 }
                 // moving shapes
                 else if (e.getKeyChar() == 'a') {
-                    movePointCloud("l", MOVING_AMOUNT); // zoom in
+                    movePointCloud("l", MOVING_AMOUNT); // left
                     System.out.println("moving left");
                 } else if (e.getKeyChar() == 'w') {
-                    movePointCloud("a", MOVING_AMOUNT); // zoom out
+                    movePointCloud("a", MOVING_AMOUNT); // above
                     System.out.println("moving avobe");
                 } else if (e.getKeyChar() == 's') {
-                    movePointCloud("b", MOVING_AMOUNT); // zoom in
+                    movePointCloud("b", MOVING_AMOUNT); // below
                     System.out.println("moving below");
                 } else if (e.getKeyChar() == 'd') {
-                    movePointCloud("r", MOVING_AMOUNT); // zoom in
+                    movePointCloud("r", MOVING_AMOUNT); // right
                     System.out.println("moving right");   
                 }
             }
@@ -118,20 +118,37 @@ public class SurfaceDrawer extends JFrame {
     }
 
     // ------ function to move the shape ------
-    public void movePointCloud(String direction, double motionFactor) {
+    public void movePointCloud(String direction, double movingAmount) {
         for (int i = 0; i < pointCloud.size(); i++) {
             Point3D point = pointCloud.get(i);
-
-            pointCloud.set(i, new Point3D(
-                point.getX() + motionFactor,
-                point.getY() + motionFactor,
-                point.getZ() + motionFactor
-            ));
+            if (direction == "l") { //left
+                pointCloud.set(i, new Point3D(
+                    point.getX() + movingAmount,
+                    point.getY(),
+                    point.getZ()
+                ));
+            } else if (direction == "a") { //above
+                pointCloud.set(i, new Point3D(
+                    point.getX(),
+                    point.getY() - movingAmount,
+                    point.getZ()
+                ));
+            } else if (direction == "b") { //below
+                pointCloud.set(i, new Point3D(
+                    point.getX(),
+                    point.getY() + movingAmount,
+                    point.getZ()
+                ));
+            } else if (direction == "r") { //right
+                pointCloud.set(i, new Point3D(
+                    point.getX() - movingAmount,
+                    point.getY(),
+                    point.getZ()
+                ));
+            } 
         }
         repaint();
     }
-
-
 
 
     private class Canvas3D extends JPanel {

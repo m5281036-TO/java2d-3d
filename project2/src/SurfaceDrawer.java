@@ -67,8 +67,6 @@ public class SurfaceDrawer extends JFrame {
                     resetObject();
                     System.out.println("Object orientation reset");
                 }
-                
-            
                 // rotateing object
                 switch (e.getKeyCode()) {
                 case KeyEvent.VK_UP:

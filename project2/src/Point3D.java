@@ -1,4 +1,5 @@
-// ------ class to call point cloud data -----
+// class to call point cloud data
+
 
 public class Point3D {
     private final double x;

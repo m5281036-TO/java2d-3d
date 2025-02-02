@@ -1,3 +1,8 @@
+// class for keyboard listener
+// reference (Japanese): 
+// https://qiita.com/derodero24/items/9ea025b92ac61edf0aa4 
+
+
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -12,9 +17,6 @@ public class SurfaceDrawerKeyListener extends KeyAdapter {
         this.surfaceDrawer = surfaceDrawer;
     }
 
-    // keyboard listener
-    // reference for on-button action
-    // https://qiita.com/derodero24/items/9ea025b92ac61edf0aa4
     @Override
     public void keyPressed(KeyEvent e) {
         // scaling object

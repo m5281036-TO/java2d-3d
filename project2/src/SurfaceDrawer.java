@@ -10,8 +10,6 @@ public class SurfaceDrawer extends JFrame {
     private List<Point3D> pointCloud;
     private List<Point3D> pointCloudOriginal;
     private String filepath;
-    private float MOVING_AMOUNT = 50; // amount of motion with one button click
-    private float ROTATION_DEGREE = 15; // amount of rotation with one button click
     private double rotationX = 0;
     private double rotationY = 0;
 
@@ -195,31 +193,6 @@ public class SurfaceDrawer extends JFrame {
             }
         }
     }
-
-
-    // ------ class to call point cloud data ------
-    private static class Point3D {
-        private final double x;
-        private final double y;
-        private final double z;
-
-        public Point3D(double x, double y, double z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        public double getX() {
-            return x;
-        }
-        public double getY() {
-            return y;
-        }
-        public double getZ() {
-            return z;
-        }
-    }
-
 
     // ------ main function ------
     public static void main(String[] args) {

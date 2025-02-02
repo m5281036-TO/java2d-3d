@@ -1,11 +1,8 @@
-import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import javax.swing.*;
 
 
 public class SurfaceDrawer extends JFrame {
@@ -30,61 +27,8 @@ public class SurfaceDrawer extends JFrame {
         pointCloudOriginal = getPointCloudFromFile(filepath); // copy original
         scalePointCloud(100);
         add(new Canvas3D());
-
-        // keyboard listener
-        // reference for on-button action
-        // https://qiita.com/derodero24/items/9ea025b92ac61edf0aa4
-        addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                // scaling object
-                if (e.getKeyChar() == '='){
-                    scalePointCloud(1.2); // zoom in
-                    System.out.println("Zoom In x1.2");
-                } else if (e.getKeyChar() == '-') {
-                    scalePointCloud(0.85); // zoom out
-                    System.out.println("Zoom Out x0.85");
-                }
-                // moving object
-                else if (e.getKeyChar() == 'a'){
-                    movePointCloud("left", MOVING_AMOUNT); // left 
-                    System.out.println("moving left");
-                }
-                else if (e.getKeyChar() == 'w'){
-                    movePointCloud("above", MOVING_AMOUNT); // left
-                    System.out.println("moving above");
-                }
-                else if (e.getKeyChar() == 's'){
-                    movePointCloud("below", MOVING_AMOUNT); // left
-                    System.out.println("moving below");
-                }
-                else if (e.getKeyChar() == 'd'){
-                    movePointCloud("right", MOVING_AMOUNT); // left
-                    System.out.println("moving right");
-                }
-                // reset orientation
-                else if (e.getKeyChar() == 'r'){
-                    resetObject();
-                    System.out.println("Object orientation reset");
-                }
-                // rotateing object
-                switch (e.getKeyCode()) {
-                case KeyEvent.VK_UP:
-                    rotatePointCloudX(-ROTATION_DEGREE); // rotate positively in x-axis
-                    break;
-                case KeyEvent.VK_DOWN:
-                    rotatePointCloudX(ROTATION_DEGREE); // rotate negatively in x-axis
-                    break;
-                case KeyEvent.VK_LEFT:
-                    rotatePointCloudY(-ROTATION_DEGREE); // rotate positively in y-axis
-                    break;
-                case KeyEvent.VK_RIGHT:
-                    rotatePointCloudY(ROTATION_DEGREE); // rotate negatively in y-axis
-                    break;
-                }
-            }
-        });
-    }
+        addKeyListener(new SurfaceDrawerKeyListener(this));
+        }
 
 
     // ------ function to specify xyz file path ------
@@ -94,7 +38,6 @@ public class SurfaceDrawer extends JFrame {
         String filepath = dir + filename;
         return filepath;
     }
-
 
     // ------ function to get point coordinates from the file ------
     private List<Point3D> getPointCloudFromFile(String filepath) {

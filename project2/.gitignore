@@ -1,4 +1,4 @@
 # do not track class files
 *.class
 
-/project2/test/
+/test/

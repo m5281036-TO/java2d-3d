@@ -29,7 +29,8 @@ public class PointCloudLoader {
     }
 
     public static String getFilePath() {
-        String filepath = Config.FILE_DIR + Config.FILE_NAME;
+        String filepath = Config.FILE_DIR + MainApp.inputFileName + ".xyz";
+        System.out.println(filepath);
         return filepath;
     }
 }
